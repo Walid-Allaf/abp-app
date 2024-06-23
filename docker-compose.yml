@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+    postgres:
+        image: postgres:16
+        environment:
+            POSTGRES_DB: dockerExample
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    db-migrator:
+        build:
+            context: .
+            dockerfile: src/dockerExample.DbMigrator/Dockerfile
+        depends_on:
+            - postgres
+
+    app:
+        build:
+            context: .
+            dockerfile: src/dockerExample.HttpApi.Host/Dockerfile
+        ports:
+            - '5000:80'
+        depends_on:
+            - db-migrator
+
+volumes:
+    postgres_data:
